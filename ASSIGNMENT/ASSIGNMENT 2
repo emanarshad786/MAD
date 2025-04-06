@@ -1,1 +1,96 @@
+import React, { useState } from 'react';
+import {
+  SectionList,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+} from 'react-native';
+
+const CONTACTS = [
+  { name: 'EMAN', number: '12345', group: 'Family' },
+  { name: 'AYESHA', number: '23456', group: 'Friends' },
+  { name: 'ALI', number: '34567', group: 'Work' },
+  { name: 'ZOHRAIN', number: '45678', group: 'Family' },
+  { name: 'AMNA', number: '56789', group: 'Friends' },
+  { name: 'AHMED', number: '67890', group: 'Work' },
+  { name: 'HUZAIFA', number: '78901', group: 'Friends' },
+  { name: 'TANZEEL', number: '89012', group: 'Family' },
+  { name: 'ROHAIL', number: '90123', group: 'Work' },
+  { name: 'RAFEH', number: '01234', group: 'Friends' },
+];
+
+export default function App() {
+  const [search, setSearch] = useState('');
+  const [selectedContact, setSelectedContact] = useState(null);
+
+  const filteredContacts = CONTACTS.filter(contact =>
+    contact.name.toLowerCase().includes(search.toLowerCase()) ||
+    contact.number.includes(search)
+  );
+
+  const groupedContacts = ['Family', 'Friends', 'Work'].map(group => ({
+    title: group,
+    data: filteredContacts.filter(contact => contact.group === group),
+  }));
+
+  return (
+    <View style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder="Search by name or number"
+        value={search}
+        onChangeText={setSearch}
+      />
+
+      <SectionList
+        sections={groupedContacts}
+        keyExtractor={(item, index) => item.name + index}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            onPress={() => setSelectedContact(item)}
+            style={styles.contactCard}>
+            <Text>{item.name}</Text>
+            <Text>{item.number}</Text>
+          </TouchableOpacity>
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.groupTitle}>{title}</Text>
+        )}
+      />
+
+      <Modal visible={!!selectedContact} transparent={true} animationType="slide">
+        <View style={styles.modalView}>
+          {selectedContact && (
+            <>
+              <Text>Name: {selectedContact.name}</Text>
+              <Text>Number: {selectedContact.number}</Text>
+              <Text>Group: {selectedContact.group}</Text>
+              <TouchableOpacity onPress={() => setSelectedContact(null)}>
+                <Text style={{ color: 'blue', marginTop: 10 }}>Close</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, marginTop: 40, padding: 10 },
+  input: { borderWidth: 1, padding: 8, marginBottom: 10, borderRadius: 5 },
+  contactCard: { padding: 10, borderBottomWidth: 1 },
+  groupTitle: { fontWeight: 'bold', fontSize: 18, backgroundColor: 'grey', padding: 5 },
+  modalView: {
+    backgroundColor: '#fff',
+    margin: 50,
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    elevation: 10,
+  },
+});
 
